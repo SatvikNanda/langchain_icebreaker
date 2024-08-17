@@ -6,9 +6,11 @@ from langchain.agents import (
     create_react_agent,
     AgentExecutor,
 )
-
 from langchain import hub
-from tools.tools import get_profile_url_tavily
+from tools import tools
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 
@@ -23,12 +25,12 @@ def lookup(name: str) -> str:
     tools_for_agent = [
         Tool(
             name="Crawl google 4 linkedin profile page",
-            func=get_profile_url_tavily,
+            func=tools.get_profile_url_tavily,
             description="useful for when you need to get the Linkedin Page URL",
         )
     ]
 
-    react_prompt = hub.pull("hwchase17/react")
+    react_prompt = hub.pull("hwchase17/react", api_key=os.getenv("LANGSMITH_API_KEY"))
 
     agent = create_react_agent(llm=llm, tools=tools_for_agent, prompt=react_prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools_for_agent, verbose=True)
@@ -42,5 +44,5 @@ def lookup(name: str) -> str:
 
 
 if __name__=="__main__":
-    linkedin_url = lookup(name="Sanya Nanda")
+    linkedin_url = lookup(name="Sanya Nanda jp morgan")
     print(linkedin_url)
