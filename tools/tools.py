@@ -7,13 +7,19 @@ load_dotenv()
 tavily_api_key = os.getenv("TAVILY_API_KEY")
 
 def get_profile_url_tavily(name: str):
-    """Searches for Linkedin profile page"""
-
+    """Searches for LinkedIn profile page and ensures it is in the correct format."""
+    
     search = TavilySearchResults()
     res = search.run(f"{name}")
-    #print("hi")
     
-    return res[0]["url"]
-    
-if __name__=="__main__":
-    get_profile_url_tavily(name="Sanya Nanda")
+    # Iterate over the results to find the first valid /in/ LinkedIn URL
+    for result in res:
+        url = result["url"]
+        if "/in/" in url:  # Check for the correct URL format
+            return url  # Return the first valid URL
+
+    raise ValueError("No valid LinkedIn /in/ URL found.")
+
+if __name__ == "__main__":
+    profile_url = get_profile_url_tavily(name="Sanya Nanda")
+    print(f"LinkedIn Profile URL: {profile_url}")
